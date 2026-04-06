@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Modify User Preferences Performance Test - PATCH /api/v1/users/{user_id}/preferences">
+      <stringProp name="TestPlan.comments">
+        Validate partial updates to user preferences via PATCH /api/v1/users/{user_id}/preferences
+        under concurrent load. Ensures p95 response time and error rate meet targets,
+        and that updates are reflected when preferences are retrieved via a subsequent GET.
+        NFR: p95 &lt;= 400ms, error rate &lt; 1%, 50 concurrent VUs, duration 300s.
+      </stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="BASE_URL" elementType="Argument">
+            <stringProp name="Argument.name">BASE_URL</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">8080</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PROTOCOL" elementType="Argument">
+            <stringProp name="Argument.name">PROTOCOL</stringProp>
+            <stringProp name="Argument.value">http</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="AUTH_TOKEN" elementType="Argument">
+            <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NDA4MzIyMSwiZXhwIjoxNzc0MTY5NjIxfQ.ViaJEe2chWM-wWjBgA14ExLq60HysLDn6JE4qcu-ipY</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NFR_P95_MS" elementType="Argument">
+            <stringProp name="Argument.name">NFR_P95_MS</stringProp>
+            <stringProp name="Argument.value">400</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NFR_ERROR_RATE_PCT" elementType="Argument">
+            <stringProp name="Argument.name">NFR_ERROR_RATE_PCT</stringProp>
+            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="THREAD_COUNT" elementType="Argument">
+            <stringProp name="Argument.name">THREAD_COUNT</stringProp>
+            <stringProp name="Argument.value">50</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RAMP_UP_SEC" elementType="Argument">
+            <stringProp name="Argument.name">RAMP_UP_SEC</stringProp>
+            <stringProp name="Argument.value">30</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="DURATION_SEC" elementType="Argument">
+            <stringProp name="Argument.name">DURATION_SEC</stringProp>
+            <stringProp name="Argument.value">30</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV – User IDs and Tokens">
+        <stringProp name="filename">test_users.csv</stringProp>
+        <stringProp name="variableNames">user_id,auth_token</stringProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="shareMode">shareMode.thread</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <stringProp name="fileEncoding"></stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+        <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+        <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="Content-Type" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+          <elementProp name="Accept" elementType="Header">
+            <stringProp name="Header.name">Accept</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+          <elementProp name="Cache-Control" elementType="Header">
+            <stringProp name="Header.name">Cache-Control</stringProp>
+            <stringProp name="Header.value">no-cache, no-store, must-revalidate</stringProp>
+          </elementProp>
+          <elementProp name="Pragma" elementType="Header">
+            <stringProp name="Header.name">Pragma</stringProp>
+            <stringProp name="Header.value">no-cache</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG – 50 VUs Static Load (PATCH + GET Verify)">
+        <stringProp name="ThreadGroup.num_threads">${THREAD_COUNT}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP_UP_SEC}</stringProp>
+        <stringProp name="ThreadGroup.duration">${DURATION_SEC}</stringProp>
+        <longProp name="ThreadGroup.delay">0</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <intProp name="LoopController.loops">-1</intProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 – Set Iteration Variables">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script">
+// Unique timestamp to prevent any CDN / reverse-proxy caching
+vars.put(&quot;TIMESTAMP&quot;, String.valueOf(System.currentTimeMillis()))
+
+// Randomly alternate language to create realistic variation in payloads
+def langs = [&quot;fr&quot;, &quot;en&quot;, &quot;de&quot;, &quot;es&quot;, &quot;it&quot;, &quot;pt&quot;]
+def lang   = langs[new Random().nextInt(langs.size())]
+vars.put(&quot;PREF_LANGUAGE&quot;, lang)
+
+// Randomly toggle email_notifications
+def emailNotif = (new Random().nextBoolean()) ? &quot;false&quot; : &quot;true&quot;
+vars.put(&quot;EMAIL_NOTIFICATIONS&quot;, emailNotif)
+
+// Resolve auth token: prefer CSV column, fall back to global variable
+def token = vars.get(&quot;auth_token&quot;)
+if (token == null || token.isEmpty() || token == &quot;null&quot;) {
+    token = vars.get(&quot;AUTH_TOKEN&quot;)
+}
+vars.put(&quot;RESOLVED_TOKEN&quot;, token)
+          </stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
+        </JSR223PreProcessor>
+        <hashTree/>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-01: PATCH User Preferences">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header – PATCH" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="Authorization" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${RESOLVED_TOKEN}</stringProp>
+              </elementProp>
+              <elementProp name="X-Request-ID" elementType="Header">
+                <stringProp name="Header.name">X-Request-ID</stringProp>
+                <stringProp name="Header.value">${__UUID()}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/${user_id}/preferences" enabled="true">
+            <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}/preferences</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;email_notifications&quot;: ${EMAIL_NOTIFICATIONS},&#xd;
+  &quot;language&quot;: &quot;${PREF_LANGUAGE}&quot;&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: HTTP 200 OK" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">PATCH must return HTTP 200</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: Response Body Not Empty" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1469">.+</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Response body must not be empty</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: email_notifications in response" enabled="true">
+              <stringProp name="JSON_PATH">$.email_notifications</stringProp>
+              <stringProp name="EXPECTED_VALUE"></stringProp>
+              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+              <stringProp name="Assertion.custom_message">Response must contain email_notifications field</stringProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: language in response" enabled="true">
+              <stringProp name="JSON_PATH">$.language</stringProp>
+              <stringProp name="EXPECTED_VALUE"></stringProp>
+              <boolProp name="JSONVALIDATION">false</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+              <stringProp name="Assertion.custom_message">Response must contain language field</stringProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Assert: Response Time &lt;= 2000ms (hard ceiling)" enabled="true">
+              <stringProp name="DurationAssertion.duration">2000</stringProp>
+              <stringProp name="Assertion.custom_message">Individual PATCH response exceeded 2000ms hard ceiling</stringProp>
+            </DurationAssertion>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract: returned_language and returned_email_notif" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="script">
+import groovy.json.JsonSlurper
+def body = prev.getResponseDataAsString()
+if (body) {
+    try {
+        def json = new JsonSlurper().parseText(body)
+        vars.put(&quot;returned_language&quot;,   json?.language?.toString()            ?: &quot;EXTRACTION_FAILED&quot;)
+        vars.put(&quot;returned_email_notif&quot;, json?.email_notifications?.toString() ?: &quot;EXTRACTION_FAILED&quot;)
+    } catch (Exception e) {
+        vars.put(&quot;returned_language&quot;,   &quot;EXTRACTION_FAILED&quot;)
+        vars.put(&quot;returned_email_notif&quot;, &quot;EXTRACTION_FAILED&quot;)
+    }
+} else {
+    vars.put(&quot;returned_language&quot;,   &quot;EXTRACTION_FAILED&quot;)
+    vars.put(&quot;returned_email_notif&quot;, &quot;EXTRACTION_FAILED&quot;)
+}
+              </stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 500ms" enabled="true">
+          <stringProp name="ConstantTimer.delay">500</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-02: GET User Preferences (Update Reflection)" enabled="false">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header – GET" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="Authorization" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${RESOLVED_TOKEN}</stringProp>
+              </elementProp>
+              <elementProp name="Cache-Control" elementType="Header">
+                <stringProp name="Header.name">Cache-Control</stringProp>
+                <stringProp name="Header.value">no-cache, no-store, must-revalidate</stringProp>
+              </elementProp>
+              <elementProp name="X-Request-ID" elementType="Header">
+                <stringProp name="Header.name">X-Request-ID</stringProp>
+                <stringProp name="Header.value">${__UUID()}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/v1/users/${user_id}/preferences" enabled="true">
+            <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}/preferences</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="_ts" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.name">_ts</stringProp>
+                  <stringProp name="Argument.value">${TIMESTAMP}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: HTTP 200 OK (GET)" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">GET must return HTTP 200</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: language matches PATCH value" enabled="true">
+              <stringProp name="JSON_PATH">$.language</stringProp>
+              <stringProp name="EXPECTED_VALUE">${PREF_LANGUAGE}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+              <stringProp name="Assertion.custom_message">GET response must reflect updated language from PATCH</stringProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: email_notifications matches PATCH value" enabled="true">
+              <stringProp name="JSON_PATH">$.email_notifications</stringProp>
+              <stringProp name="EXPECTED_VALUE">${EMAIL_NOTIFICATIONS}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+              <stringProp name="Assertion.custom_message">GET response must reflect updated email_notifications from PATCH</stringProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Assert: GET Response Time &lt;= 2000ms" enabled="true">
+              <stringProp name="DurationAssertion.duration">2000</stringProp>
+              <stringProp name="Assertion.custom_message">Individual GET response exceeded 2000ms hard ceiling</stringProp>
+            </DurationAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 250ms (post-GET)">
+          <stringProp name="ConstantTimer.delay">250</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>true</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">results/summary_report.csv</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="filename">results/aggregate_report.csv</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results – Errors Only">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>true</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>true</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+          </value>
+        </objProp>
+        <stringProp name="filename">results/errors.jtl</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp TG – Create results dir" enabled="true">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Create results directory">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script">
+new File(&quot;results&quot;).mkdirs()
+SampleResult.setResponseMessage(&quot;results/ directory ready&quot;)
+SampleResult.setSuccessful(true)
+          </stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown TG – NFR Threshold Validation" enabled="true">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </PostThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="NFR Validation – p95 &amp; Error Rate Check" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script">
+// ─────────────────────────────────────────────────────────────────────────────
+// NFR Threshold Validation
+// Reads results/summary_report.csv, extracts PATCH transaction rows,
+// and asserts:
+//   1. p95 response time  ≤ 400 ms
+//   2. Error rate         &lt; 1 %
+// ─────────────────────────────────────────────────────────────────────────────
+
+def resultsFile = new File(&quot;results/summary_report.csv&quot;)
+if (!resultsFile.exists()) {
+    log.warn(&quot;NFR Validation: results/summary_report.csv not found – skipping post-hoc check&quot;)
+    SampleResult.setResponseMessage(&quot;WARNING: results file not found&quot;)
+    SampleResult.setSuccessful(true)
+    return
+}
+
+// ── Parse CSV ──────────────────────────────────────────────────────────────
+def lines     = resultsFile.readLines()
+def header    = lines[0].split(&quot;,&quot;).collect { it.trim().toLowerCase() }
+
+def tsIdx     = header.indexOf(&quot;timestamp&quot;)
+def labelIdx  = header.indexOf(&quot;label&quot;)
+def timeIdx   = header.indexOf(&quot;elapsed&quot;)       // response time ms
+def successIdx = header.indexOf(&quot;success&quot;)
+def codeIdx   = header.indexOf(&quot;responsecode&quot;)
+
+if (timeIdx == -1 || labelIdx == -1) {
+    log.warn(&quot;NFR Validation: Cannot locate required columns in CSV header&quot;)
+    SampleResult.setResponseMessage(&quot;WARNING: CSV column mapping failed&quot;)
+    SampleResult.setSuccessful(true)
+    return
+}
+
+def patchTimes   = []
+def patchTotal   = 0
+def patchErrors  = 0
+
+lines.drop(1).each { line -&gt;
+    if (!line.trim()) return
+    def cols = line.split(&quot;,&quot;, -1)
+    def label = cols[labelIdx]?.trim()
+
+    // Match on the PATCH transaction label
+    if (label?.contains(&quot;PATCH&quot;) || label?.contains(&quot;TX-01&quot;)) {
+        patchTotal++
+        try {
+            def rt = cols[timeIdx]?.trim()?.toLong()
+            if (rt != null) patchTimes &lt;&lt; rt
+        } catch (e) { /* skip malformed rows */ }
+
+        def success = cols[successIdx]?.trim()?.toLowerCase()
+        if (success == &quot;false&quot;) patchErrors++
+    }
+}
+
+if (patchTotal == 0) {
+    log.warn(&quot;NFR Validation: No PATCH samples found in results CSV&quot;)
+    SampleResult.setResponseMessage(&quot;WARNING: no PATCH samples in results&quot;)
+    SampleResult.setSuccessful(true)
+    return
+}
+
+// ── Compute p95 ────────────────────────────────────────────────────────────
+patchTimes.sort()
+int p95Idx = (int) Math.ceil(0.95 * patchTimes.size()) - 1
+long p95   = patchTimes[Math.max(0, p95Idx)]
+
+// ── Compute error rate ─────────────────────────────────────────────────────
+double errorRatePct = (patchErrors / (double) patchTotal) * 100.0
+
+// ── NFR thresholds ─────────────────────────────────────────────────────────
+long   nfrP95Ms      = (vars?.get(&quot;NFR_P95_MS&quot;)?.toLong()         ?: 400L)
+double nfrErrRatePct = (vars?.get(&quot;NFR_ERROR_RATE_PCT&quot;)?.toDouble() ?: 1.0)
+
+def sb = new StringBuilder()
+sb.append(&quot;NFR Validation Results\n&quot;)
+sb.append(&quot;  Total PATCH samples : ${patchTotal}\n&quot;)
+sb.append(&quot;  Error count         : ${patchErrors}\n&quot;)
+sb.append(&quot;  Error rate          : ${String.format(&apos;%.2f&apos;, errorRatePct)}%  (target: &lt; ${nfrErrRatePct}%)\n&quot;)
+sb.append(&quot;  p95 response time   : ${p95} ms  (target: &lt;= ${nfrP95Ms} ms)\n&quot;)
+
+boolean p95Pass  = p95 &lt;= nfrP95Ms
+boolean errPass  = errorRatePct &lt; nfrErrRatePct
+
+sb.append(&quot;\n  [p95]        : ${p95Pass  ? &apos;PASS&apos; : &apos;FAIL&apos;}\n&quot;)
+sb.append(&quot;  [error rate] : ${errPass  ? &apos;PASS&apos; : &apos;FAIL&apos;}\n&quot;)
+
+log.info(sb.toString())
+SampleResult.setResponseData(sb.toString().getBytes(&quot;UTF-8&quot;))
+SampleResult.setResponseMessage(sb.toString())
+SampleResult.setSuccessful(p95Pass &amp;&amp; errPass)
+
+if (!p95Pass) {
+    log.error(&quot;NFR BREACH: p95 = ${p95}ms exceeds threshold of ${nfrP95Ms}ms&quot;)
+}
+if (!errPass) {
+    log.error(&quot;NFR BREACH: error rate = ${String.format(&apos;%.2f&apos;, errorRatePct)}% exceeds threshold of ${nfrErrRatePct}%&quot;)
+}
+          </stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: NFR thresholds met" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2150174">FAIL</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">NFR threshold breached – see sampler response for details</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <boolProp name="Assertion.negate">true</boolProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
