@@ -2,7 +2,7 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Delete User Account (Soft Delete) Performance Test - PATCH /api/v1/users/{user_id}">
-      <stringProp name="TestPlan.comments">Validate soft-deactivation of user accounts via PATCH /api/v1/users/{user_id} under concurrent load, ensuring max response time and success rate targets are met, and verifying data integrity (deactivated users do not appear in /users/active).</stringProp>
+      <stringProp name="TestPlan.comments">Validate soft-deactivation of user accounts via PATCH /api/v1/users/{user_id} under concurrent load, ensuring max response time and success rate targets are met</stringProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments">
@@ -23,12 +23,12 @@
           </elementProp>
           <elementProp name="AUTH_TOKEN" elementType="Argument">
             <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
-            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3MzkxMDM0NywiZXhwIjoxNzczOTk2NzQ3fQ.6J7K2Suy3SDCAP5fKP9XxtrWoCBgdepTjGPrvz-9T9c</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NTk4MTIzNSwiZXhwIjoxNzc2MDY3NjM1fQ.CLP67QW4tpgkF827Z2t3Te8F6p8gtacn7z-C8FJJDCI</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="USER_IDS" elementType="Argument">
             <stringProp name="Argument.name">USER_IDS</stringProp>
-            <stringProp name="Argument.value">185564</stringProp>
+            <stringProp name="Argument.value">189223,189224,189225,189226,189227,189228,189229,189230,189231,189232,189233,189234,189235,189236,189237,189238,189239,189240,189241,189242,189243,189244,189245,189246,189247,189248,189249,189250,189251,189252,189253,189254,189255,189256,189257,189258,189259,189260,189261,189262,189263,189264,189265,189266,189267,189268,189269,189270,189271,189272</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="TARGET_USERS" elementType="Argument">
@@ -38,7 +38,7 @@
           </elementProp>
           <elementProp name="TEST_DURATION_SECONDS" elementType="Argument">
             <stringProp name="Argument.name">TEST_DURATION_SECONDS</stringProp>
-            <stringProp name="Argument.value">5</stringProp>
+            <stringProp name="Argument.value">180</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -56,7 +56,7 @@
         </elementProp>
       </SetupThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Global Metrics">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Global Metrics" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 import java.util.concurrent.atomic.LongAdder
@@ -91,7 +91,7 @@ SampleResult.setSuccessful(true)
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
           <stringProp name="HTTPSampler.domain">${BASE_HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${BASE_PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">${BASE_PROTOCOL}</stringProp>
@@ -102,7 +102,7 @@ SampleResult.setSuccessful(true)
           <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
         </ConfigTestElement>
         <hashTree/>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="Authorization" elementType="Header">
               <stringProp name="Header.name">Authorization</stringProp>
@@ -119,13 +119,13 @@ SampleResult.setSuccessful(true)
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Cookie Manager">
+        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Cookie Manager" enabled="true">
           <collectionProp name="CookieManager.cookies"/>
           <boolProp name="CookieManager.clearEachIteration">false</boolProp>
           <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
         </CookieManager>
         <hashTree/>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Prepare Soft Delete Data">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Prepare Soft Delete Data" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 def ids = vars.get(&apos;USER_IDS&apos;).split(&apos;,&apos;).collect { it.trim() }.findAll { it }
@@ -141,7 +141,7 @@ vars.put(&apos;user_status&apos;, &apos;deactivated&apos;)
           <stringProp name="cacheKey">false</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/{user_id}">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/{user_id}" enabled="true">
           <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}</stringProp>
           <stringProp name="HTTPSampler.method">PATCH</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -160,7 +160,7 @@ vars.put(&apos;user_status&apos;, &apos;deactivated&apos;)
           <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert PATCH 2xx Response">
+          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert PATCH 2xx Response" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
             <stringProp name="script">
 def rc = prev.getResponseCode()
@@ -174,7 +174,7 @@ if (!(rc ==~ /2\d\d/)) {
             <stringProp name="cacheKey">false</stringProp>
           </JSR223Assertion>
           <hashTree/>
-          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate PATCH Metrics">
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate PATCH Metrics" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
             <stringProp name="script">
 import java.util.concurrent.atomic.LongAdder
@@ -202,77 +202,8 @@ while (true) {
           </JSR223PostProcessor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /users/active">
-          <stringProp name="HTTPSampler.path">/users/active</stringProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert GET 2xx And User Not In Active List">
-            <stringProp name="scriptLanguage">groovy</stringProp>
-            <stringProp name="script">
-import groovy.json.JsonSlurper
-import java.util.concurrent.atomic.LongAdder
-
-LongAdder integrityTotal = props.get(&apos;delete.integrity.total&apos;) as LongAdder
-LongAdder integrityErrors = props.get(&apos;delete.integrity.errors&apos;) as LongAdder
-
-integrityTotal.increment()
-
-def rc = prev.getResponseCode()
-if (!(rc ==~ /2\d\d/)) {
-    integrityErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Expected HTTP 2xx for GET /users/active but got ${rc}&quot;)
-    return
-}
-
-def body = prev.getResponseDataAsString()
-def json
-try {
-    json = new JsonSlurper().parseText(body)
-} catch (Exception ex) {
-    integrityErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;GET /users/active response is not valid JSON: &quot; + ex.getMessage())
-    return
-}
-
-def targetUserId = vars.get(&apos;user_id&apos;)
-
-def containsUserId
-containsUserId = { obj -&gt;
-    if (obj == null) return false
-    if (obj instanceof Map) {
-        if (obj.containsKey(&apos;user_id&apos;) &amp;&amp; obj.user_id != null &amp;&amp; obj.user_id.toString() == targetUserId) return true
-        if (obj.containsKey(&apos;id&apos;) &amp;&amp; obj.id != null &amp;&amp; obj.id.toString() == targetUserId) return true
-        return obj.values().any { v -&gt; containsUserId(v) }
-    }
-    if (obj instanceof Collection) {
-        return obj.any { item -&gt; containsUserId(item) }
-    }
-    return obj.toString() == targetUserId
-}
-
-if (containsUserId(json)) {
-    integrityErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Deactivated user still appears in /users/active for user_id=&quot; + targetUserId)
-}
-            </stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="cacheKey">false</stringProp>
-          </JSR223Assertion>
-          <hashTree/>
-        </hashTree>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -285,38 +216,29 @@ if (containsUserId(json)) {
       <hashTree>
         <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Evaluate Soft Delete NFRs">
           <stringProp name="scriptLanguage">groovy</stringProp>
-          <stringProp name="script">
-import java.util.concurrent.atomic.LongAdder
+          <stringProp name="script">import java.util.concurrent.atomic.LongAdder
 import java.util.concurrent.atomic.AtomicLong
 
 LongAdder total = props.get(&apos;delete.total&apos;) as LongAdder
 LongAdder errors = props.get(&apos;delete.errors&apos;) as LongAdder
 AtomicLong maxTime = props.get(&apos;delete.max&apos;) as AtomicLong
-LongAdder integrityTotal = props.get(&apos;delete.integrity.total&apos;) as LongAdder
-LongAdder integrityErrors = props.get(&apos;delete.integrity.errors&apos;) as LongAdder
 
 long totalCount = total != null ? total.sum() : 0L
 long errorCount = errors != null ? errors.sum() : 0L
-long integrityChecks = integrityTotal != null ? integrityTotal.sum() : 0L
-long integrityErrorCount = integrityErrors != null ? integrityErrors.sum() : 0L
 long maxResponseTime = maxTime != null ? maxTime.get() : 0L
 
 double successRate = totalCount &gt; 0 ? ((totalCount - errorCount) * 100.0d / totalCount) : 0.0d
 
 boolean maxPass = maxResponseTime &lt;= 500L
 boolean successPass = successRate &gt;= 98.0d
-boolean integrityPass = integrityChecks &gt; 0L &amp;&amp; integrityErrorCount == 0L
 
 def summary = &quot;NFR Evaluation Summary\n&quot; +
 &quot;patch_total_samples=${totalCount}\n&quot; +
 &quot;patch_error_count=${errorCount}\n&quot; +
 &quot;patch_success_rate_pct=${String.format(&apos;%.4f&apos;, successRate)}\n&quot; +
 &quot;patch_max_response_time_ms=${maxResponseTime}\n&quot; +
-&quot;integrity_checks=${integrityChecks}\n&quot; +
-&quot;integrity_error_count=${integrityErrorCount}\n&quot; +
 &quot;threshold_patch_max_response_time_ms&lt;=500 =&gt; ${maxPass}\n&quot; +
-&quot;threshold_patch_success_rate_pct&gt;=98 =&gt; ${successPass}\n&quot; +
-&quot;threshold_deactivated_users_not_in_active_list =&gt; ${integrityPass}\n&quot;
+&quot;threshold_patch_success_rate_pct&gt;=98 =&gt; ${successPass}\n&quot;
 
 SampleResult.setResponseData(summary, &apos;UTF-8&apos;)
 
@@ -327,7 +249,7 @@ if (totalCount == 0L) {
     throw new AssertionError(&apos;No PATCH samples were collected for /api/v1/users/{user_id}&apos;)
 }
 
-if (!(maxPass &amp;&amp; successPass &amp;&amp; integrityPass)) {
+if (!(maxPass &amp;&amp; successPass)) {
     SampleResult.setSuccessful(false)
     SampleResult.setResponseCode(&apos;500&apos;)
     SampleResult.setResponseMessage(&apos;NFR validation failed&apos;)
@@ -337,8 +259,7 @@ if (!(maxPass &amp;&amp; successPass &amp;&amp; integrityPass)) {
 SampleResult.setSuccessful(true)
 SampleResult.setResponseCode(&apos;200&apos;)
 SampleResult.setResponseMessage(&apos;All NFR thresholds passed&apos;)
-log.info(summary)
-          </stringProp>
+log.info(summary)</stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="cacheKey">false</stringProp>

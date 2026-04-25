@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="User Registration Performance Test - /api/v1/users/register">
-      <stringProp name="TestPlan.comments">Validate the User Registration endpoint performance under concurrent load, ensuring p95 response time, error rate, and throughput meet NFR targets while simulating up to 100 concurrent users.</stringProp>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Delete User Account (Soft Delete) Performance Test - PATCH /api/v1/users/{user_id}">
+      <stringProp name="TestPlan.comments">Validate soft-deactivation of user accounts via PATCH /api/v1/users/{user_id} under concurrent load, ensuring max response time and success rate targets are met</stringProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments">
@@ -13,7 +13,7 @@
           </elementProp>
           <elementProp name="BASE_HOST" elementType="Argument">
             <stringProp name="Argument.name">BASE_HOST</stringProp>
-            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.value">127.0.0.1</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="BASE_PORT" elementType="Argument">
@@ -21,14 +21,24 @@
             <stringProp name="Argument.value">8080</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="TARGET_USERS" elementType="Argument">
-            <stringProp name="Argument.name">TARGET_USERS</stringProp>
-            <stringProp name="Argument.value">100</stringProp>
+          <elementProp name="AUTH_TOKEN" elementType="Argument">
+            <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NTk4MTIzNSwiZXhwIjoxNzc2MDY3NjM1fQ.CLP67QW4tpgkF827Z2t3Te8F6p8gtacn7z-C8FJJDCI</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="PASSWORD" elementType="Argument">
-            <stringProp name="Argument.name">PASSWORD</stringProp>
-            <stringProp name="Argument.value">StrongP@ssword!</stringProp>
+          <elementProp name="USER_IDS" elementType="Argument">
+            <stringProp name="Argument.name">USER_IDS</stringProp>
+            <stringProp name="Argument.value">189223,189224,189225,189226,189227,189228,189229,189230,189231,189232,189233,189234,189235,189236,189237,189238,189239,189240,189241,189242,189243,189244,189245,189246,189247,189248,189249,189250,189251,189252,189253,189254,189255,189256,189257,189258,189259,189260,189261,189262,189263,189264,189265,189266,189267,189268,189269,189270,189271,189272</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TARGET_USERS" elementType="Argument">
+            <stringProp name="Argument.name">TARGET_USERS</stringProp>
+            <stringProp name="Argument.value">50</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TEST_DURATION_SECONDS" elementType="Argument">
+            <stringProp name="Argument.name">TEST_DURATION_SECONDS</stringProp>
+            <stringProp name="Argument.value">180</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -39,41 +49,42 @@
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
           <stringProp name="LoopController.loops">1</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </SetupThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Metrics" enabled="true">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Global Metrics" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
-          <stringProp name="cacheKey">true</stringProp>
           <stringProp name="script">
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.LongAdder
-props.put(&apos;reg.total&apos;, new LongAdder())
-props.put(&apos;reg.errors&apos;, new LongAdder())
-props.put(&apos;reg.times&apos;, new ConcurrentLinkedQueue&lt;Long&gt;())
-props.put(&apos;reg.firstSampleTs&apos;, new AtomicLong(0L))
-props.put(&apos;reg.lastSampleTs&apos;, new AtomicLong(0L))
-SampleResult.setSuccessful(true)
+import java.util.concurrent.atomic.AtomicLong
+
+props.put(&apos;delete.total&apos;, new LongAdder())
+props.put(&apos;delete.errors&apos;, new LongAdder())
+props.put(&apos;delete.max&apos;, new AtomicLong(0L))
+props.put(&apos;delete.integrity.total&apos;, new LongAdder())
+props.put(&apos;delete.integrity.errors&apos;, new LongAdder())
+
 SampleResult.setResponseCode(&apos;200&apos;)
-SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
+SampleResult.setResponseMessage(&apos;Soft delete metrics initialized&apos;)
+SampleResult.setSuccessful(true)
           </stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
         </JSR223Sampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Ramp Up - 100 Concurrent Users for 300s">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="One-Shot Load - 50 Concurrent Deactivations" enabled="true">
         <stringProp name="ThreadGroup.num_threads">${TARGET_USERS}</stringProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
-        <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-          <intProp name="LoopController.loops">-1</intProp>
+          <stringProp name="LoopController.loops">1</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </ThreadGroup>
@@ -91,6 +102,10 @@ SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
         <hashTree/>
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
           <collectionProp name="HeaderManager.headers">
+            <elementProp name="Authorization" elementType="Header">
+              <stringProp name="Header.name">Authorization</stringProp>
+              <stringProp name="Header.value">Bearer ${AUTH_TOKEN}</stringProp>
+            </elementProp>
             <elementProp name="Content-Type" elementType="Header">
               <stringProp name="Header.name">Content-Type</stringProp>
               <stringProp name="Header.value">application/json</stringProp>
@@ -108,23 +123,25 @@ SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
           <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
         </CookieManager>
         <hashTree/>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Generate Unique Registration Data" enabled="true">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Prepare Soft Delete Data" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
-          <stringProp name="cacheKey">true</stringProp>
           <stringProp name="script">
-def ts = System.currentTimeMillis()
-def rand = UUID.randomUUID().toString().replace(&apos;-&apos;, &apos;&apos;).substring(0, 12)
-vars.put(&apos;reg_username&apos;, &quot;test_user${ts}_${ctx.getThreadNum()}_${rand}&quot;)
-vars.put(&apos;reg_email&apos;, &quot;test${ts}_${ctx.getThreadNum()}_${rand}@example.com&quot;)
+def ids = vars.get(&apos;USER_IDS&apos;).split(&apos;,&apos;).collect { it.trim() }.findAll { it }
+if (ids.isEmpty()) {
+    throw new IllegalStateException(&apos;USER_IDS must contain at least one existing active user_id&apos;)
+}
+def userId = ids[ctx.getThreadNum() % ids.size()]
+vars.put(&apos;user_id&apos;, userId)
+vars.put(&apos;user_status&apos;, &apos;deactivated&apos;)
           </stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/v1/users/register" enabled="true">
-          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-          <stringProp name="HTTPSampler.path">http://localhost:8080//api/v1/users/register</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/{user_id}" enabled="true">
+          <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}</stringProp>
+          <stringProp name="HTTPSampler.method">PATCH</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -132,9 +149,7 @@ vars.put(&apos;reg_email&apos;, &quot;test${ts}_${ctx.getThreadNum()}_${rand}@ex
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-  &quot;username&quot;: &quot;${reg_username}&quot;,&#xd;
-  &quot;email&quot;: &quot;${reg_email}&quot;,&#xd;
-  &quot;password&quot;: &quot;${PASSWORD}&quot;&#xd;
+  &quot;status&quot;: &quot;${user_status}&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
@@ -143,54 +158,50 @@ vars.put(&apos;reg_email&apos;, &quot;test${ts}_${ctx.getThreadNum()}_${rand}@ex
           <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert HTTP 2xx" enabled="true">
+          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert PATCH 2xx Response" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
-            <stringProp name="cacheKey">true</stringProp>
             <stringProp name="script">
 def rc = prev.getResponseCode()
 if (!(rc ==~ /2\d\d/)) {
     AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Expected HTTP 2xx but got ${rc}&quot;)
+    AssertionResult.setFailureMessage(&quot;Expected HTTP 2xx for PATCH /api/v1/users/{user_id} but got ${rc}&quot;)
 }
             </stringProp>
             <stringProp name="parameters"></stringProp>
             <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">false</stringProp>
           </JSR223Assertion>
           <hashTree/>
-          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate Registration Metrics" enabled="true">
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate PATCH Metrics" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
-            <stringProp name="cacheKey">true</stringProp>
             <stringProp name="script">
-import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.LongAdder
-LongAdder total = props.get(&apos;reg.total&apos;) as LongAdder
-LongAdder errors = props.get(&apos;reg.errors&apos;) as LongAdder
-def times = props.get(&apos;reg.times&apos;)
-AtomicLong firstTs = props.get(&apos;reg.firstSampleTs&apos;) as AtomicLong
-AtomicLong lastTs = props.get(&apos;reg.lastSampleTs&apos;) as AtomicLong
-long sampleStart = prev.getStartTime()
-long sampleEnd = prev.getEndTime()
+import java.util.concurrent.atomic.AtomicLong
+
+LongAdder total = props.get(&apos;delete.total&apos;) as LongAdder
+LongAdder errors = props.get(&apos;delete.errors&apos;) as LongAdder
+AtomicLong maxTime = props.get(&apos;delete.max&apos;) as AtomicLong
+
 total.increment()
-if (!prev.isSuccessful()) { errors.increment() }
-times.add(prev.getTime() as Long)
-while (true) {
-  long cur = firstTs.get()
-  if (cur != 0L &amp;&amp; cur &lt;= sampleStart) { break }
-  if (firstTs.compareAndSet(cur, sampleStart)) { break }
+if (!prev.isSuccessful()) {
+    errors.increment()
 }
+
+long sampleTime = prev.getTime()
 while (true) {
-  long cur = lastTs.get()
-  if (cur &gt;= sampleEnd) { break }
-  if (lastTs.compareAndSet(cur, sampleEnd)) { break }
+    long cur = maxTime.get()
+    if (cur &gt;= sampleTime) { break }
+    if (maxTime.compareAndSet(cur, sampleTime)) { break }
 }
             </stringProp>
             <stringProp name="parameters"></stringProp>
             <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">false</stringProp>
           </JSR223PostProcessor>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -201,66 +212,62 @@ while (true) {
         </elementProp>
       </PostThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Evaluate NFRs" enabled="true">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Evaluate Soft Delete NFRs">
           <stringProp name="scriptLanguage">groovy</stringProp>
-          <stringProp name="cacheKey">true</stringProp>
-          <stringProp name="script">
+          <stringProp name="script">import java.util.concurrent.atomic.LongAdder
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.atomic.LongAdder
-LongAdder total = props.get(&apos;reg.total&apos;) as LongAdder
-LongAdder errors = props.get(&apos;reg.errors&apos;) as LongAdder
-def queue = props.get(&apos;reg.times&apos;)
-AtomicLong firstTs = props.get(&apos;reg.firstSampleTs&apos;) as AtomicLong
-AtomicLong lastTs = props.get(&apos;reg.lastSampleTs&apos;) as AtomicLong
+
+LongAdder total = props.get(&apos;delete.total&apos;) as LongAdder
+LongAdder errors = props.get(&apos;delete.errors&apos;) as LongAdder
+AtomicLong maxTime = props.get(&apos;delete.max&apos;) as AtomicLong
+
 long totalCount = total != null ? total.sum() : 0L
 long errorCount = errors != null ? errors.sum() : 0L
-def times = []
-if (queue != null) { times.addAll(queue) }
-Collections.sort(times)
-long p95 = 0L
-if (times.size() &gt; 0) {
-  int index = Math.ceil(times.size() * 0.95d) as int
-  index = Math.max(1, index) - 1
-  p95 = (times[index] as Number).longValue()
-}
-long first = firstTs != null ? firstTs.get() : 0L
-long last = lastTs != null ? lastTs.get() : 0L
-double elapsedSec = (first &gt; 0L &amp;&amp; last &gt; first) ? ((last - first) / 1000.0d) : 0.0d
-double throughput = elapsedSec &gt; 0 ? (totalCount / elapsedSec) : 0.0d
-double errorRate = totalCount &gt; 0 ? (errorCount * 100.0d / totalCount) : 100.0d
-boolean p95Pass = p95 &lt;= 500L
-boolean errorPass = errorRate &lt; 1.0d
-boolean throughputPass = throughput &gt;= 150.0d
-def summary = &quot;&quot;&quot;NFR Evaluation Summary
-total_samples=${totalCount}
-error_count=${errorCount}
-error_rate_pct=${String.format(&apos;%.4f&apos;, errorRate)}
-p95_ms=${p95}
-throughput_rps=${String.format(&apos;%.4f&apos;, throughput)}
-threshold_p95_ms&lt;=500 =&gt; ${p95Pass}
-threshold_error_rate_pct&lt;1 =&gt; ${errorPass}
-threshold_throughput_rps&gt;=150 =&gt; ${throughputPass}
-&quot;&quot;&quot;
-log.info(summary)
+long maxResponseTime = maxTime != null ? maxTime.get() : 0L
+
+double successRate = totalCount &gt; 0 ? ((totalCount - errorCount) * 100.0d / totalCount) : 0.0d
+
+boolean maxPass = maxResponseTime &lt;= 500L
+boolean successPass = successRate &gt;= 98.0d
+
+def sb = new StringBuilder()
+sb.append(&apos;═══════════════════════════════════════════════\n&apos;)
+sb.append(&apos;  NFR VALIDATION REPORT – Soft Delete PerfTest\n&apos;)
+sb.append(&apos;═══════════════════════════════════════════════\n&apos;)
+sb.append(&quot;  Total PATCH samples     : ${totalCount}\n&quot;)
+sb.append(&quot;  Failed PATCH samples    : ${errorCount}\n&quot;)
+sb.append(String.format(&apos;  Success rate            : %.2f%%  (target: &gt;= 98.0%%)  [%s]\n&apos;,
+          successRate, successPass ? &apos;PASS&apos; : &apos;FAIL&apos;))
+sb.append(&quot;  Max response time       : ${maxResponseTime} ms  (target: &lt;= 500 ms)  [${maxPass ? &apos;PASS&apos; : &apos;FAIL&apos;}]\n&quot;)
+sb.append(&apos;═══════════════════════════════════════════════\n&apos;)
+sb.append(&quot;  OVERALL NFR RESULT      : ${(maxPass &amp;&amp; successPass) ? &apos;PASS&apos; : &apos;FAIL&apos;}\n&quot;)
+sb.append(&apos;═══════════════════════════════════════════════\n&apos;)
+def summary = sb.toString()
+
 SampleResult.setResponseData(summary, &apos;UTF-8&apos;)
+log.info(summary)
+System.out.println(summary)
+
 if (totalCount == 0L) {
-  SampleResult.setSuccessful(false)
-  SampleResult.setResponseCode(&apos;500&apos;)
-  SampleResult.setResponseMessage(&apos;No samples were collected&apos;)
-  throw new AssertionError(&apos;No samples were collected for /api/v1/users/register&apos;)
+    SampleResult.setSuccessful(false)
+    SampleResult.setResponseCode(&apos;500&apos;)
+    SampleResult.setResponseMessage(&apos;No PATCH samples were collected&apos;)
+    throw new AssertionError(&apos;No PATCH samples were collected for /api/v1/users/{user_id}&apos;)
 }
-if (!(p95Pass &amp;&amp; errorPass &amp;&amp; throughputPass)) {
-  SampleResult.setSuccessful(false)
-  SampleResult.setResponseCode(&apos;500&apos;)
-  SampleResult.setResponseMessage(&apos;NFR validation failed&apos;)
-  throw new AssertionError(summary)
+
+if (!(maxPass &amp;&amp; successPass)) {
+    SampleResult.setSuccessful(false)
+    SampleResult.setResponseCode(&apos;500&apos;)
+    SampleResult.setResponseMessage(&apos;NFR validation failed&apos;)
+    throw new AssertionError(summary)
 }
+
 SampleResult.setSuccessful(true)
 SampleResult.setResponseCode(&apos;200&apos;)
-SampleResult.setResponseMessage(&apos;All NFR thresholds passed&apos;)
-          </stringProp>
+SampleResult.setResponseMessage(&apos;All NFR thresholds passed&apos;)</stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
         </JSR223Sampler>
         <hashTree/>
       </hashTree>

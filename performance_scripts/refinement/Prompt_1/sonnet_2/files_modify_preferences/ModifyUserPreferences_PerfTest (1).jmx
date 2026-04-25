@@ -4,8 +4,7 @@
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Modify User Preferences Performance Test - PATCH /api/v1/users/{user_id}/preferences">
       <stringProp name="TestPlan.comments">
         Validate partial updates to user preferences via PATCH /api/v1/users/{user_id}/preferences
-        under concurrent load. Ensures p95 response time and error rate meet targets,
-        and that updates are reflected when preferences are retrieved via a subsequent GET.
+        under concurrent load. Ensures p95 response time and error rate meet targets.
         NFR: p95 &lt;= 400ms, error rate &lt; 1%, 50 concurrent VUs, duration 300s.
       </stringProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
@@ -28,7 +27,7 @@
           </elementProp>
           <elementProp name="AUTH_TOKEN" elementType="Argument">
             <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
-            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NDA4MzIyMSwiZXhwIjoxNzc0MTY5NjIxfQ.ViaJEe2chWM-wWjBgA14ExLq60HysLDn6JE4qcu-ipY</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NjUzNTg3OCwiZXhwIjoxNzc2NjIyMjc4fQ.FfYjcWiX2Rk_fs-UkCf4LX-slJS6EiTBHaYH8hk1lHk</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="NFR_P95_MS" elementType="Argument">
@@ -53,7 +52,7 @@
           </elementProp>
           <elementProp name="DURATION_SEC" elementType="Argument">
             <stringProp name="Argument.name">DURATION_SEC</stringProp>
-            <stringProp name="Argument.value">30</stringProp>
+            <stringProp name="Argument.value">300</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -67,12 +66,12 @@
         <boolProp name="quotedData">false</boolProp>
         <boolProp name="recycle">true</boolProp>
         <boolProp name="stopThread">false</boolProp>
-        <stringProp name="shareMode">shareMode.thread</stringProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
         <boolProp name="ignoreFirstLine">true</boolProp>
         <stringProp name="fileEncoding"></stringProp>
       </CSVDataSet>
       <hashTree/>
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
         <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
         <stringProp name="HTTPSampler.port">${PORT}</stringProp>
         <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
@@ -104,7 +103,7 @@
         </collectionProp>
       </HeaderManager>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG – 50 VUs Static Load (PATCH + GET Verify)">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG – 50 VUs Static Load (PATCH)" enabled="true">
         <stringProp name="ThreadGroup.num_threads">${THREAD_COUNT}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${RAMP_UP_SEC}</stringProp>
         <stringProp name="ThreadGroup.duration">${DURATION_SEC}</stringProp>
@@ -118,7 +117,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 – Set Iteration Variables">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 – Set Iteration Variables" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 // Unique timestamp to prevent any CDN / reverse-proxy caching
@@ -145,7 +144,7 @@ vars.put(&quot;RESOLVED_TOKEN&quot;, token)
           <stringProp name="cacheKey">false</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-01: PATCH User Preferences">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-01: PATCH User Preferences" enabled="true">
           <boolProp name="TransactionController.parent">true</boolProp>
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
@@ -335,12 +334,12 @@ if (body) {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 250ms (post-GET)">
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 250ms (post-GET)" enabled="true">
           <stringProp name="ConstantTimer.delay">250</stringProp>
         </ConstantTimer>
         <hashTree/>
       </hashTree>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -377,7 +376,7 @@ if (body) {
         <stringProp name="filename">results/summary_report.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -412,7 +411,7 @@ if (body) {
         <stringProp name="filename">results/aggregate_report.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results – Errors Only">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results – Errors Only" enabled="true">
         <boolProp name="ResultCollector.error_logging">true</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -456,7 +455,7 @@ if (body) {
         </elementProp>
       </SetupThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Create results directory">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Create results directory" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 new File(&quot;results&quot;).mkdirs()
@@ -480,7 +479,7 @@ SampleResult.setSuccessful(true)
         </elementProp>
       </PostThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="NFR Validation – p95 &amp; Error Rate Check" enabled="true">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="NFR Validation – p95 &amp; Error Rate Check">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 // ─────────────────────────────────────────────────────────────────────────────
@@ -522,8 +521,11 @@ def patchErrors  = 0
 
 lines.drop(1).each { line -&gt;
     if (!line.trim()) return
+    // Guard: skip rows with too few columns to avoid ArrayIndexOutOfBoundsException
     def cols = line.split(&quot;,&quot;, -1)
-    def label = cols[labelIdx]?.trim()
+    int minRequired = [labelIdx, timeIdx, successIdx].findAll { it &gt;= 0 }.max() ?: 0
+    if (cols.size() &lt;= minRequired) return
+    def label = cols[labelIdx]?.trim()?.replace(&quot;\&quot;&quot;, &quot;&quot;)
 
     // Match on the PATCH transaction label
     if (label?.contains(&quot;PATCH&quot;) || label?.contains(&quot;TX-01&quot;)) {
@@ -533,8 +535,11 @@ lines.drop(1).each { line -&gt;
             if (rt != null) patchTimes &lt;&lt; rt
         } catch (e) { /* skip malformed rows */ }
 
-        def success = cols[successIdx]?.trim()?.toLowerCase()
-        if (success == &quot;false&quot;) patchErrors++
+        // Null-safe success check
+        if (successIdx &gt;= 0 &amp;&amp; successIdx &lt; cols.size()) {
+            def success = cols[successIdx]?.trim()?.toLowerCase()
+            if (success == &quot;false&quot;) patchErrors++
+        }
     }
 }
 

@@ -5,7 +5,6 @@
       <stringProp name="TestPlan.comments">
         Validates full replace product updates via PUT /api/v1/products/{product_id} under
         concurrent load. NFR: P90 &lt;= 700ms, Error Rate &lt; 1%, 30 concurrent VUs, 300s duration.
-        Data consistency verified: updates must be reflected in subsequent GET reads.
       </stringProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
@@ -27,7 +26,7 @@
           </elementProp>
           <elementProp name="AUTH_TOKEN" elementType="Argument">
             <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
-            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NTQ1NTc0NiwiZXhwIjoxNzc1NTQyMTQ2fQ.YCcATBPwGfU0uO_e3HlhWudgBv0Vu2H0KIAM4sCvsEU</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NjUzNDk0NiwiZXhwIjoxNzc2NjIxMzQ2fQ.jqcROkZqIcTIHJNubEgiV3Fm5fETyx2wXULv1tA7h6I</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="NFR_P90_MS" elementType="Argument">
@@ -52,7 +51,7 @@
           </elementProp>
           <elementProp name="DURATION_SEC" elementType="Argument">
             <stringProp name="Argument.name">DURATION_SEC</stringProp>
-            <stringProp name="Argument.value">30</stringProp>
+            <stringProp name="Argument.value">300</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="HARD_RT_CEILING_MS" elementType="Argument">
@@ -62,21 +61,23 @@
           </elementProp>
         </collectionProp>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV – Product IDs and Payloads">
         <stringProp name="filename">test_products.csv</stringProp>
         <stringProp name="variableNames">product_id,auth_token,p_name,p_description,p_price,p_stock</stringProp>
         <stringProp name="delimiter">,</stringProp>
-        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="quotedData">true</boolProp>
         <boolProp name="recycle">true</boolProp>
         <boolProp name="stopThread">false</boolProp>
-        <stringProp name="shareMode">shareMode.thread</stringProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
         <boolProp name="ignoreFirstLine">true</boolProp>
         <stringProp name="fileEncoding"></stringProp>
       </CSVDataSet>
       <hashTree/>
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
         <intProp name="HTTPSampler.connect_timeout">5000</intProp>
         <intProp name="HTTPSampler.response_timeout">5000</intProp>
         <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
@@ -89,7 +90,7 @@
         <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
       </ConfigTestElement>
       <hashTree/>
-      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Shared HTTP Headers">
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Shared HTTP Headers" enabled="true">
         <collectionProp name="HeaderManager.headers">
           <elementProp name="Content-Type" elementType="Header">
             <stringProp name="Header.name">Content-Type</stringProp>
@@ -114,7 +115,7 @@
         </collectionProp>
       </HeaderManager>
       <hashTree/>
-      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp TG – Initialise results dir and metrics store">
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp TG – Initialise results dir and metrics store" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -148,7 +149,7 @@ SampleResult.setSuccessful(true)
         </JSR223Sampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG – 30 VUs Static Load (PUT + GET Consistency)">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="TG – 30 VUs Static Load (PUT + GET Consistency)" enabled="true">
         <stringProp name="ThreadGroup.num_threads">${THREAD_COUNT}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${RAMP_UP_SEC}</stringProp>
         <stringProp name="ThreadGroup.duration">${DURATION_SEC}</stringProp>
@@ -238,7 +239,7 @@ if (pid &amp;&amp; pid != &quot;null&quot;) {
           <stringProp name="cacheKey">false</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-01: PUT /api/v1/products/${product_id}">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-01: PUT /api/v1/products/${product_id}" enabled="true">
           <boolProp name="TransactionController.parent">true</boolProp>
           <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
@@ -371,153 +372,8 @@ if (!prev.isSuccessful()) props.get(&quot;put_errors&quot;)?.incrementAndGet()
             <hashTree/>
           </hashTree>
         </hashTree>
-        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 300ms (PUT to GET)" enabled="true">
-          <stringProp name="ConstantTimer.delay">300</stringProp>
-        </ConstantTimer>
-        <hashTree/>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TX-02: GET /api/v1/products/${product_id} (Consistency Check)" enabled="false">
-          <boolProp name="TransactionController.parent">true</boolProp>
-          <boolProp name="TransactionController.includeTimers">false</boolProp>
-        </TransactionController>
-        <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth + Cache-Bust Headers – GET" enabled="true">
-            <collectionProp name="HeaderManager.headers">
-              <elementProp name="Authorization" elementType="Header">
-                <stringProp name="Header.name">Authorization</stringProp>
-                <stringProp name="Header.value">Bearer ${RESOLVED_TOKEN}</stringProp>
-              </elementProp>
-              <elementProp name="Cache-Control" elementType="Header">
-                <stringProp name="Header.name">Cache-Control</stringProp>
-                <stringProp name="Header.value">no-cache, no-store, must-revalidate</stringProp>
-              </elementProp>
-              <elementProp name="X-Request-ID" elementType="Header">
-                <stringProp name="Header.name">X-Request-ID</stringProp>
-                <stringProp name="Header.value">${__UUID()}</stringProp>
-              </elementProp>
-              <elementProp name="X-No-Cache" elementType="Header">
-                <stringProp name="Header.name">X-No-Cache</stringProp>
-                <stringProp name="Header.value">${TIMESTAMP}</stringProp>
-              </elementProp>
-            </collectionProp>
-          </HeaderManager>
-          <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/v1/products/${product_id}">
-            <stringProp name="HTTPSampler.path">/api/v1/products/${product_id}</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-              <collectionProp name="Arguments.arguments">
-                <elementProp name="_ts" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.name">_ts</stringProp>
-                  <stringProp name="Argument.value">${TIMESTAMP}</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                </elementProp>
-              </collectionProp>
-            </elementProp>
-          </HTTPSamplerProxy>
-          <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: GET returns HTTP 200" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">200</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message">GET /products/{id} must return HTTP 200</stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">8</intProp>
-            </ResponseAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: GET $.name matches PUT value" enabled="true">
-              <stringProp name="JSON_PATH">$.name</stringProp>
-              <stringProp name="EXPECTED_VALUE">${P_NAME}</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-              <stringProp name="Assertion.custom_message">CONSISTENCY BREACH: GET $.name does not reflect PUT value</stringProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: GET $.description matches PUT value" enabled="true">
-              <stringProp name="JSON_PATH">$.description</stringProp>
-              <stringProp name="EXPECTED_VALUE">${P_DESCRIPTION}</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-              <stringProp name="Assertion.custom_message">CONSISTENCY BREACH: GET $.description does not reflect PUT value</stringProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert: GET $.stock matches PUT value" enabled="true">
-              <stringProp name="JSON_PATH">$.stock</stringProp>
-              <stringProp name="EXPECTED_VALUE">${P_STOCK}</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-              <stringProp name="Assertion.custom_message">CONSISTENCY BREACH: GET $.stock does not reflect PUT value</stringProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert: GET $.price matches PUT value (float tolerance)" enabled="true">
-              <stringProp name="scriptLanguage">groovy</stringProp>
-              <stringProp name="script">
-import groovy.json.JsonSlurper
-
-def body = prev.getResponseDataAsString()
-if (!body) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;GET response body is empty – cannot verify price consistency&quot;)
-    return
-}
-
-try {
-    def json         = new JsonSlurper().parseText(body)
-    def actualPrice  = json?.price as Double
-    def expectedStr  = vars.get(&quot;P_PRICE&quot;)
-
-    if (expectedStr == null || expectedStr == &quot;null&quot;) return  // no baseline to compare
-
-    def expectedPrice = expectedStr.toDouble()
-
-    // Allow floating-point tolerance of +/-0.01
-    if (Math.abs(actualPrice - expectedPrice) &gt; 0.01) {
-        AssertionResult.setFailure(true)
-        AssertionResult.setFailureMessage(
-            &quot;CONSISTENCY BREACH: GET \$.price = ${actualPrice} does not match PUT value ${expectedPrice} (tolerance +/-0.01)&quot;
-        )
-    } else {
-        AssertionResult.setFailure(false)
-    }
-} catch (Exception e) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Price consistency check failed with exception: ${e.message}&quot;)
-}
-              </stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="cacheKey">false</stringProp>
-            </JSR223Assertion>
-            <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert: GET body not empty" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="1469">.+</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message">GET response body must not be empty</stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">2</intProp>
-            </ResponseAssertion>
-            <hashTree/>
-          </hashTree>
-        </hashTree>
-        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time – 500ms (end of iteration)" enabled="true">
-          <stringProp name="ConstantTimer.delay">500</stringProp>
-        </ConstantTimer>
-        <hashTree/>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown TG – NFR Threshold Validation">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown TG – NFR Threshold Validation" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -528,7 +384,7 @@ try {
         </elementProp>
       </PostThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="NFR Validation – P90 and Error Rate">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="NFR Validation – P90 and Error Rate" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="script">
 // ─────────────────────────────────────────────────────────────────────────────

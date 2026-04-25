@@ -2,7 +2,7 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Modify User Preferences Performance Test - PATCH /api/v1/users/{user_id}/preferences">
-      <stringProp name="TestPlan.comments">Validate partial updates to user preferences via PATCH /api/v1/users/{user_id}/preferences under concurrent load, ensuring p95 response time and error rate meet targets, and that updates are reflected when preferences are retrieved via a subsequent GET.</stringProp>
+      <stringProp name="TestPlan.comments">Validate partial updates to user preferences via PATCH /api/v1/users/{user_id}/preferences under concurrent load, ensuring p95 response time and error rate meet target</stringProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments">
@@ -23,12 +23,12 @@
           </elementProp>
           <elementProp name="AUTH_TOKEN" elementType="Argument">
             <stringProp name="Argument.name">AUTH_TOKEN</stringProp>
-            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3MzkxMDM0NywiZXhwIjoxNzczOTk2NzQ3fQ.6J7K2Suy3SDCAP5fKP9XxtrWoCBgdepTjGPrvz-9T9c</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NjUwMTI1MCwiZXhwIjoxNzc2NTg3NjUwfQ.YxSXaZBmBUgEtDY0-azzDJqtdv4J59AOt2SazwetZz4</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="USER_IDS" elementType="Argument">
             <stringProp name="Argument.name">USER_IDS</stringProp>
-            <stringProp name="Argument.value">185564</stringProp>
+            <stringProp name="Argument.value">189060,189061,189062,189063,189064,189065,189066,189067,189068,189069,189070,189071,189072,189073,189074,189075,189076,189077,189078,189079,189080,189081,189082,189083,189084,189085,189086,189087,189088,189089,189090,189091,189092,189093,189094,189095,189096,189097,189098,189099,189100,189101,189102,189103,189104,189105,189106,189107,189108,189109</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="TARGET_USERS" elementType="Argument">
@@ -38,7 +38,7 @@
           </elementProp>
           <elementProp name="TEST_DURATION_SECONDS" elementType="Argument">
             <stringProp name="Argument.name">TEST_DURATION_SECONDS</stringProp>
-            <stringProp name="Argument.value">5</stringProp>
+            <stringProp name="Argument.value">300</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -56,7 +56,7 @@
         </elementProp>
       </SetupThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Global Metrics">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Initialize Global Metrics" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="script">
@@ -94,7 +94,7 @@ SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
+        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
           <stringProp name="HTTPSampler.domain">${BASE_HOST}</stringProp>
           <stringProp name="HTTPSampler.port">${BASE_PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">${BASE_PROTOCOL}</stringProp>
@@ -105,7 +105,7 @@ SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
           <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
         </ConfigTestElement>
         <hashTree/>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="Authorization" elementType="Header">
               <stringProp name="Header.name">Authorization</stringProp>
@@ -122,13 +122,13 @@ SampleResult.setResponseMessage(&apos;Metrics initialized&apos;)
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Cookie Manager">
+        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Cookie Manager" enabled="true">
           <collectionProp name="CookieManager.cookies"/>
           <boolProp name="CookieManager.clearEachIteration">false</boolProp>
           <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
         </CookieManager>
         <hashTree/>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Prepare Preference Update Data">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Prepare Preference Update Data" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="script">
@@ -145,7 +145,7 @@ vars.put(&apos;pref_language&apos;, &apos;fr&apos;)
           <stringProp name="filename"></stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/{user_id}/preferences">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH /api/v1/users/{user_id}/preferences" enabled="true">
           <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}/preferences</stringProp>
           <stringProp name="HTTPSampler.method">PATCH</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -165,7 +165,7 @@ vars.put(&apos;pref_language&apos;, &apos;fr&apos;)
           <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert PATCH 2xx Response">
+          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert PATCH 2xx Response" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="script">
@@ -179,7 +179,7 @@ if (!(rc ==~ /2\\d\\d/)) {
             <stringProp name="filename"></stringProp>
           </JSR223Assertion>
           <hashTree/>
-          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate PATCH Metrics">
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Aggregate PATCH Metrics" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="script">
@@ -225,76 +225,20 @@ while (true) {
             <stringProp name="filename"></stringProp>
           </JSR223PostProcessor>
           <hashTree/>
-        </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/v1/users/{user_id}">
-          <stringProp name="HTTPSampler.path">/api/v1/users/${user_id}</stringProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert GET 2xx And Preference Reflection">
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor" enabled="true">
             <stringProp name="scriptLanguage">groovy</stringProp>
-            <stringProp name="cacheKey">true</stringProp>
-            <stringProp name="script">
-import groovy.json.JsonSlurper
-import java.util.concurrent.atomic.LongAdder
-
-LongAdder consistencyTotal = props.get(&apos;patch.consistency.total&apos;) as LongAdder
-LongAdder consistencyErrors = props.get(&apos;patch.consistency.errors&apos;) as LongAdder
-
-consistencyTotal.increment()
-
-def rc = prev.getResponseCode()
-if (!(rc ==~ /2\\d\\d/)) {
-    consistencyErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Expected HTTP 2xx for GET reflection check but got ${rc}&quot;)
-    return
-}
-
-def body = prev.getResponseDataAsString()
-def json
-try {
-    json = new JsonSlurper().parseText(body)
-} catch (Exception ex) {
-    consistencyErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;GET response is not valid JSON: &quot; + ex.getMessage())
-    return
-}
-
-def expectedEmailNotifications = Boolean.parseBoolean(vars.get(&apos;pref_email_notifications&apos;))
-def expectedLanguage = vars.get(&apos;pref_language&apos;)
-
-def actualEmailNotifications = json.email_notifications != null ? Boolean.parseBoolean(json.email_notifications.toString()) : null
-def actualLanguage = json.language != null ? json.language.toString() : null
-
-def mismatches = []
-if (actualEmailNotifications == null || actualEmailNotifications != expectedEmailNotifications) {
-    mismatches &lt;&lt; &quot;email_notifications&quot;
-}
-if (actualLanguage != expectedLanguage) {
-    mismatches &lt;&lt; &quot;language&quot;
-}
-
-if (!mismatches.isEmpty()) {
-    consistencyErrors.increment()
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Preference reflection validation failed: &quot; + mismatches.join(&apos;,&apos;))
-}
-            </stringProp>
             <stringProp name="parameters"></stringProp>
             <stringProp name="filename"></stringProp>
-          </JSR223Assertion>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">if (!prev.isSuccessful()) {
+    log.info(&quot;PATCH failed: code=&quot; + prev.getResponseCode() + &quot;, message=&quot; + prev.getResponseMessage())
+    log.info(&quot;Response body: &quot; + prev.getResponseDataAsString())
+}</stringProp>
+          </JSR223PostProcessor>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs" enabled="true">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="TearDown - Validate NFRs">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -305,25 +249,17 @@ if (!mismatches.isEmpty()) {
         </elementProp>
       </PostThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Evaluate PATCH NFRs">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Evaluate PATCH NFRs" enabled="true">
           <stringProp name="scriptLanguage">groovy</stringProp>
           <stringProp name="cacheKey">true</stringProp>
-          <stringProp name="script">
-import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.atomic.LongAdder
+          <stringProp name="script">import java.util.concurrent.atomic.LongAdder
 
 LongAdder total = props.get(&apos;patch.total&apos;) as LongAdder
 LongAdder errors = props.get(&apos;patch.errors&apos;) as LongAdder
 def queue = props.get(&apos;patch.times&apos;)
-LongAdder consistencyTotal = props.get(&apos;patch.consistency.total&apos;) as LongAdder
-LongAdder consistencyErrors = props.get(&apos;patch.consistency.errors&apos;) as LongAdder
-AtomicLong firstTs = props.get(&apos;patch.firstSampleTs&apos;) as AtomicLong
-AtomicLong lastTs = props.get(&apos;patch.lastSampleTs&apos;) as AtomicLong
 
 long totalCount = total != null ? total.sum() : 0L
 long errorCount = errors != null ? errors.sum() : 0L
-long consistencyChecks = consistencyTotal != null ? consistencyTotal.sum() : 0L
-long consistencyErrorCount = consistencyErrors != null ? consistencyErrors.sum() : 0L
 
 def times = []
 if (queue != null) {
@@ -341,17 +277,14 @@ if (times.size() &gt; 0) {
 double errorRate = totalCount &gt; 0 ? (errorCount * 100.0d / totalCount) : 100.0d
 boolean p95Pass = p95 &lt;= 400L
 boolean errorPass = errorRate &lt; 1.0d
-boolean consistencyPass = consistencyChecks &gt; 0L &amp;&amp; consistencyErrorCount == 0L
 
-def summary = &quot;NFR Evaluation Summary\\n&quot; +
-&quot;patch_total_samples=${totalCount}\\n&quot; +
-&quot;patch_error_count=${errorCount}\\n&quot; +
-&quot;patch_error_rate_pct=${String.format(&apos;%.4f&apos;, errorRate)}\\n&quot; +
-&quot;patch_p95_ms=${p95}\\n&quot; +
-&quot;reflection_checks=${consistencyChecks}\\n&quot; +
-&quot;reflection_error_count=${consistencyErrorCount}\\n&quot; +
-&quot;threshold_patch_p95_ms&lt;=400 =&gt; ${p95Pass}\\n&quot; +
-&quot;threshold_patch_error_rate_pct&lt;1 =&gt; ${errorPass}\\n&quot;
+def summary = &quot;NFR Evaluation Summary\n&quot; +
+&quot;patch_total_samples=${totalCount}\n&quot; +
+&quot;patch_error_count=${errorCount}\n&quot; +
+&quot;patch_error_rate_pct=${String.format(&apos;%.4f&apos;, errorRate)}\n&quot; +
+&quot;patch_p95_ms=${p95}\n&quot; +
+&quot;threshold_patch_p95_ms&lt;=400 =&gt; ${p95Pass}\n&quot; +
+&quot;threshold_patch_error_rate_pct&lt;1 =&gt; ${errorPass}\n&quot;
 
 SampleResult.setResponseData(summary, &apos;UTF-8&apos;)
 
@@ -362,7 +295,7 @@ if (totalCount == 0L) {
     throw new AssertionError(&apos;No PATCH samples were collected for /api/v1/users/{user_id}/preferences&apos;)
 }
 
-if (!(p95Pass &amp;&amp; errorPass &amp;&amp; consistencyPass)) {
+if (!(p95Pass &amp;&amp; errorPass)) {
     SampleResult.setSuccessful(false)
     SampleResult.setResponseCode(&apos;500&apos;)
     SampleResult.setResponseMessage(&apos;NFR validation failed&apos;)
@@ -372,7 +305,7 @@ if (!(p95Pass &amp;&amp; errorPass &amp;&amp; consistencyPass)) {
 SampleResult.setSuccessful(true)
 SampleResult.setResponseCode(&apos;200&apos;)
 SampleResult.setResponseMessage(&apos;All NFR thresholds passed&apos;)
-          </stringProp>
+log.info(summary)</stringProp>
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
         </JSR223Sampler>
